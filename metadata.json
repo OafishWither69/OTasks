@@ -1,0 +1,6 @@
+{
+  "name": "Bulk Tracker",
+  "description": "A personal, offline, single-user weight gain and meal tracker.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
