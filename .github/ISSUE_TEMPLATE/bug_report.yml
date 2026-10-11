@@ -1,0 +1,26 @@
+name: Bug report
+description: Report an OTasks problem
+body:
+  - type: textarea
+    id: happened
+    attributes: { label: What happened? }
+    validations: { required: true }
+  - type: textarea
+    id: steps
+    attributes: { label: Steps to reproduce }
+    validations: { required: true }
+  - type: textarea
+    id: expected
+    attributes: { label: Expected behavior }
+  - type: input
+    id: version
+    attributes: { label: App version }
+  - type: input
+    id: device
+    attributes: { label: Device and Android version }
+  - type: textarea
+    id: info
+    attributes: { label: Copy device info }
+  - type: textarea
+    id: screenshots
+    attributes: { label: Screenshots }

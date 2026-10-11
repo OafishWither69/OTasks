@@ -2,13 +2,13 @@
 
 This file tracks the build. It is not part of the app. Claude Code updates it at the start and end of every phase; the owner ticks the manual checks after testing on real devices.
 
-**Spec version:** 1.3 · **Current phase:** preparation — specification corrections complete; Phase 1 not started · **Last updated:** 10 October 2026 (Asia/Calcutta)
+**Spec version:** 1.3 · **Current phase:** 1 — in progress · **Last updated:** 11 October 2026 (Asia/Calcutta)
 
 ## Phase status
 
 | Phase | Name | Target version | Status | Latest alpha | Release link | Reviewed (Opus) | Started | Finished |
 |---|---|---|---|---|---|---|---|---|
-| 1 | Foundation and data | 0.1.0 | Not started | — | — | — | | |
+| 1 | Foundation and data | 0.1.0 | In progress | — | — | — | 2026-10-11 | |
 | 2 | Setup and Today | 0.2.0 | Not started | — | — | — | | |
 | 3 | Foods, meals and scopes | 0.3.0 | Not started | — | — | — | | |
 | 4 | Schedule | 0.4.0 | Not started | — | — | — | | |
@@ -35,9 +35,9 @@ One row per published alpha. Newest first.
 
 ## Release signing
 
-- Keystore created: no (Phase 1, SPEC R3d)
-- Certificate SHA-256: —
-- GitHub secrets set: no
+- Keystore created: yes, outside the repository at `%LOCALAPPDATA%/OTasksTools/signing/otasks-release.jks` (RSA 4096, 30 years; alias `otasks-release`)
+- Certificate SHA-256: `B7:B7:88:C7:1D:F1:C9:73:A1:FA:2F:E6:07:D3:43:50:EF:8B:86:34:89:8F:BE:65:92:8A:3D:01:C1:82:AD:29`
+- GitHub secrets set: no; owner approval required by SPEC R3d. Keystore and passwords have current-user-only Windows permissions and are never committed.
 - Owner confirmed keystore backup: no
 - `release` environment (tags `v*` only) created: no (SPEC 18.4a)
 - `main` branch protection (PRs + green CI): no
@@ -52,14 +52,16 @@ Reviewed prototype commit `b76f7b8efa7d1dde3cdceb7797093833bb088e53` (9 October 
 - Review seen: owner asked what to do next and authorized starting specification corrections on 10 October 2026. Owner explicitly chose preserving past plans/targets while allowing intake/weight corrections. The existing no-prototype-data-migration rule is unchanged; no claim of an approved or completed Phase 1 review/release.
 - No prototype source/build/resource files changed during preparation.
 
-- Tag `prototype-final`: not created yet
-- Prototype removed: no
+- Tag `prototype-final`: created at b76f7b8efa7d1dde3cdceb7797093833bb088e53 and pushed to origin on 11 October 2026; additional ZIP archive retained outside the repository
+- Prototype removed: yes, isolated commit on codex/phase-1-foundation; corrected contract/evidence preserved
 
 ## Current phase plan
 
 Preparation complete on branch `codex/spec-corrections`: root SPEC.md v1.3, aligned CLAUDE.md, this tracker, correction decisions/regression cases in docs/SPEC-CORRECTIONS.md. Original ZIP/reference copies are intact outside the clone.
 
-Next: Phase 1, in small compiling steps:
+Phase 1 in progress on `codex/phase-1-foundation`. Scope reaches root/module build files, wrapper, CI, manifest/resources/fonts/theme/navigation, all section 7 entities/DAOs, preference registry/domain mappings, meal/history repositories, domain and Room tests, screenshot fixtures and release documentation. The different package keeps installed prototype data separate; the prototype tag/archive preserves source.
+
+Order, in small compiling steps:
 1. Preserve the exact prototype commit with prototype-final; remove prototype files only after preservation, retaining the new contract/evidence documents.
 2. Establish a complete pinned Gradle wrapper, JDK/toolchain and three modules; verify wrapper, debug build, domain tests and lint before growing the app.
 3. Add all section 7 entities/schema, repositories and meal-domain rules, including historical snapshots, UNIQUE log enforcement and transactional scope remapping. Add meaningful unit/Room tests.
@@ -67,12 +69,37 @@ Next: Phase 1, in small compiling steps:
 5. Configure CI/release pipeline and deliberate release-key custody. Signing secrets/settings and independent reviewer are still outstanding; never mark them done without evidence.
 6. Run phase checks, obtain independent review, then release/test alpha. No implementation, release, model-specific review or real-device checks have occurred in preparation.
 
+## Phase 1 implementation and verification
+
+Implemented on `codex/phase-1-foundation`; this is a foundation shell, not a usable meal-planning release yet.
+
+- Complete Gradle project and wrapper, version catalog, JDK 17 targets, three modules, separate debug package, release signing requirement and shrinker configuration.
+- Bundled Lora/Inter fonts and licences, exact light/dark palette and tokens, adaptive bottom/rail navigation, edge-to-edge insets and highest-refresh preference. Every destination deliberately shows the Phase 1 message required by SPEC 20.1 step 5.
+- All 28 Room entities/DAOs, version 1 schema at `app/schemas/com.otasks.app.data.db.OTasksDatabase/1.json`, converters, mappings, lazy unlocked-only database access and the A11 invalidation trigger (logging only).
+- All 80 preference keys/defaults, registry metadata, validated writes and reset handling, four alarm profiles, pure Kotlin meal/day/amount/goal/scope rules and transactional meal/history repositories.
+- H1 backfills unopened elapsed days before plan mutations. H2 corrections change intake or weight while saved plans, targets and completion denominators remain fixed. Scope splits remap future references transactionally.
+- Read-only default workflow permissions, full action SHA pins, wrapper validation, domain/Room/screenshots/lint/debug checks, API 31/34 device smoke workflow, Dependabot, signed release verification/publishing script and install/privacy/release documentation.
+
+Local verification:
+
+- `:domain:test`: 8 tests; `:app:testDebugUnitTest`: 53 tests including 15 Room/repository tests, 32 screenshot configurations producing 128 navigation images, 2 Material component images and 4 palette/contrast tests. Separate `:app:verifyRoborazziDebug` passed after recording; ripples are disabled only in screenshot tests.
+- `:app:lintDebug`, `:app:assembleDebug`, `:app:assembleDebugAndroidTest`, `:app:checkVersioning` and `spotlessCheck` passed locally. Release publishing script has 2 passing standard-library tests, including old/new apksigner output and version boundaries.
+- `:app:assembleRelease`: signed/minified APK built locally, 2,826,921 bytes (under 10 MB), signature verified against the certificate above. SHA-256: `0c101f092224e2ec82ba8434acc667bdd6fb1a8372c254ce68a39d112e71c0a6`. Local output: `%LOCALAPPDATA%/OTasksTools/build/_app/outputs/apk/release/app-release.apk`.
+- Merged release manifest checked: no INTERNET permission, backup disabled; exported components are MainActivity and the DUMP-protected AndroidX ProfileInstallReceiver allowed by SP2. No app-owned exported provider/service/receiver.
+- Local API 31 installation did not run: emulator userdata allocation is blocked by available disk space. This is not a device pass.
+
+Remote Actions results, independent review and owner acceptance remain pending. No release has been published.
+
 ## Decisions
 
 Internal choices the spec left open (SPEC §0.4). Newest first.
 
 | Date | Phase | Decision | Why |
 |---|---|---|---|
+| 2026-10-11 | 1 | KSP uses its independent 2.3.12 release number with Kotlin 2.4.21 | Current KSP releases no longer share the Kotlin version prefix; the pinned combination compiles this project |
+| 2026-10-11 | 1 | Keep local generated build output outside OneDrive with an untracked init script | OneDrive read-only directory attributes prevented Gradle from replacing intermediates; CI uses normal build paths |
+| 2026-10-11 | 1 | Historical time snapshots use stored ideal/pinned times until the Phase 5 planner exists | Phase 1 must preserve metadata without implementing later timing features |
+| 2026-10-11 | 1 | Screenshot tests disable ripples during capture and advance the Compose clock | Native render-thread ripples were nondeterministic; production feedback is unchanged |
 | 2026-10-10 | Preparation | Preserve past plans/targets; allow food-log and weight corrections (H1/H2) | Explicit owner answer during this session |
 | 2026-10-10 | Preparation | Apply correction defaults and regression cases S1–S16, SPEC v1.3 | Owner authorized the proposed specification correction pass; individual technical decisions recorded in docs/SPEC-CORRECTIONS.md |
 
@@ -88,14 +115,18 @@ Anything built differently from SPEC.md, with the owner's approval. Each one sho
 
 | ID | Found in | Description | Severity | Status |
 |---|---|---|---|---|
-| BUILD-1 | Prototype | Complete wrapper and custom debug keystore absent | Blocking build | Open; foundation will replace setup |
+| BUILD-1 | Prototype | Complete wrapper and custom debug keystore absent | Blocking build | Resolved by the new pinned wrapper and separate debug package |
+| DEVICE-1 | Phase 1 | Local API 31 emulator cannot create its userdata partition: approximately 7.2 GB free required, approximately 4.2 GB available | Verification limit | Device smoke checks added to pull requests; no local device pass claimed |
+| RELEASE-1 | Phase 1 | Release environment, tag ruleset, signing secrets and main branch protection await owner approval; independent review and real-device checks remain open | Release gate | No alpha tag or GitHub release published |
 | REVIEW-1 | Preparation | Independent phase review and owner-device checks not run | Release gate | Open |
 | VOICE-1 | Phase 14 | VC0 gate must be rechecked at that phase; not implemented | Deferred | Open |
 
 ## Notes for later phases
 
 - Follow the correction regression cases by phase in docs/SPEC-CORRECTIONS.md; textual resolution is not implementation validation.
-- No source changes, tags, commits, remote pushes, settings changes, signing secrets or releases were made during preparation.
+- During the earlier specification preparation, no implementation or release actions were taken. The Phase 1 prototype tag/removal and implementation above happened afterward.
+- Phase 5 must replace ideal/pinned history times with the completed DayPlanner output. Phase 8 must add the C3 range completion query when History becomes functional.
+- Baseline profile generator is scaffolded; generation and hardware performance checks require a working device/emulator.
 
 ## Manual checks
 
