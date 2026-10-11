@@ -15,7 +15,9 @@ jobs:
           java-version: '17'
       - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
       - name: Install build SDK
-        run: sdkmanager "platforms;android-37.0" "build-tools;37.0.0"
+        uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd # v4.0.4
+        with:
+          packages: 'platform-tools platforms;android-37.0 build-tools;37.0.0'
       - run: python3 -m unittest discover -s .github/scripts -p 'test_*.py'
       - run: ./gradlew :domain:test :app:testDebugUnitTest :app:verifyRoborazziDebug :app:lintDebug :app:assembleDebug :app:checkVersioning spotlessCheck
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

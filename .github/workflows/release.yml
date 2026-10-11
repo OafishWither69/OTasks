@@ -26,7 +26,9 @@ jobs:
         with:
           cache-disabled: true
       - name: Install build SDK
-        run: sdkmanager "platforms;android-37.0" "build-tools;37.0.0"
+        uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd # v4.0.4
+        with:
+          packages: 'platform-tools platforms;android-37.0 build-tools;37.0.0'
       - run: python3 -m unittest discover -s .github/scripts -p 'test_*.py'
       - name: Check tag and protected branch ancestry
         run: |
